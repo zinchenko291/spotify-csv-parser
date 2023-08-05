@@ -1,6 +1,7 @@
 import argparse
 import csv
 import sys
+from tqdm import tqdm
 from ytmusicapi import YTMusic as YTM
 
 def createArgParser() -> argparse.ArgumentParser:
@@ -34,23 +35,19 @@ def parseCSV(file: str = 'spotlistr-exported-playlist.csv') -> list:
     with open(file, newline='') as csvfile:
         songsList = csv.reader(csvfile)
         for row in songsList:
-            songs.append(Song(row[0], row[1], row[2]))
+            try:
+                songs.append(Song(row[0], row[1], row[2]))
+            except: pass
     return songs
 
 def searchSongs(songs: list) -> list:
     YTMusic = YTM()
     urls = []
     urlBase = 'https://music.youtube.com/watch?v='
-    for i in range(len(songs)):
-        song = songs[i]
+    for song in tqdm(songs):
         searched = YTMusic.search(query=song.getArtist() + ' ' + song.getTrack(), filter='songs', limit=1)
         try:
             urls.append(urlBase + searched[0]['videoId'])
-            
-            # Log
-            sys.stdout.write('\x1b[2K')
-            print(f"Song {i + 1}/{len(songs)}: {searched[0]['artists'][0]['name']} - {searched[0]['title']}")
-            print("\033[A\033[A")
         except IndexError:
             print('\n' + song.getArtist() + ' ' + song.getTrack() + ' - NOT FOUND')
     return urls
