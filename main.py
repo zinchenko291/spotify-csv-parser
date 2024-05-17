@@ -32,13 +32,13 @@ class Song():
 
 def parseCSV(file: str = 'spotlistr-exported-playlist.csv') -> list:
     songs = []
-    with open(file, newline='') as csvfile:
+    with open(file, newline='', encoding="UTF-8") as csvfile:
         songsList = csv.reader(csvfile)
         for row in songsList:
             try:
                 songs.append(Song(row[0], row[1], row[2]))
             except: pass
-    return songs
+    return songs[1:]
 
 def searchSongs(songs: list) -> list:
     YTMusic = YTM()
